@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'dhyey0512/zomato_clone'
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/dhyey0512/Devops.git'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'dhyey0512', passwordVariable: 'Dhyey@0512')]) {
+                    sh 'docker login -u $USERNAME -p $PASSWORD'
+                    sh 'docker push $DOCKER_IMAGE'
+                }
+            }
+        }
+        stage('Infrastructure Setup') {
+            steps {
+                sh 'terraform init && terraform apply -auto-approve'
+            }
+        }
+        stage('Run Application') {
+            steps {
+                sh 'docker-compose up -d'
+            }
+        }
+        stage('ELK Monitoring') {
+            steps {
+                // Add commands to integrate ELK stack for logging and monitoring
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build and Deploy Successful!'
+        }
+        failure {
+            echo 'Build Failed'
+        }
+    }
+}
+
