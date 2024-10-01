@@ -1,0 +1,25 @@
+version: '3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    environment:
+      - "discovery.type=single-node"  # Run as a single-node Elasticsearch cluster
+    ports:
+      - "9200:9200"  # Elasticsearch service exposed on port 9200
+    volumes:
+      - esdata:/usr/share/elasticsearch/data  # Persistent volume for data storage
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.10.1
+    ports:
+      - "5000:5000"  # Logstash listens for log data on port 5000
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf  # Custom logstash configuration file
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.1
+    ports:
+      - "5601:5601"  # Kibana service exposed on port 5601
+
+volumes:
+  esdata:
