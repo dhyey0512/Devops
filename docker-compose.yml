@@ -1,0 +1,8 @@
+version: '3'
+services:
+  zomato-app:
+    image: dhyey0512/zomato_clone  # Make sure to use the correct image
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
